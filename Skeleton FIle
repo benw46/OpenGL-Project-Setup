@@ -1,0 +1,76 @@
+#include <iostream>
+#include <sstream>
+
+#define GLEW_STATIC
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+
+const char* APP_TITLE = "TITLE";
+const int gWindowWidth = 1200;
+const int gWindowHeight = 900;
+GLFWwindow* gWindow = NULL;
+
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
+bool initOpenGL();
+
+int main()
+{
+	if (!initOpenGL())
+	{
+		std::cerr << "Failed to init" << std::endl;
+		return -1;
+	}
+
+	// Main loop
+	while (!glfwWindowShouldClose(gWindow))
+	{
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
+	return 0;
+}
+
+bool initOpenGL()
+{
+	if (!glfwInit())
+	{
+		std::cerr << "GLFW failed to init" << std::endl;
+		return false;
+	}
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	GLFWwindow* pWindow = NULL;
+
+	gWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
+
+	if (gWindow == NULL)
+	{
+		std::cerr << "Failed to create GLFW window!" << std::endl;
+		glfwTerminate();
+		return false;
+	}
+
+	glfwMakeContextCurrent(gWindow);
+
+	glfwSetKeyCallback(gWindow, glfw_onKey);
+
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK)
+	{
+		std::cerr << "Failed to init GLEW!" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
